@@ -1,4 +1,4 @@
-package com.insurance.pct.sw_insurance;
+package com.sw.insurance;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -8,6 +8,7 @@ public class SwInsuranceApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(SwInsuranceApplication.class, args);
+        System.out.println("Hello Sweden Insurance!");
 	}
 
 }

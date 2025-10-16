@@ -1,4 +1,4 @@
-package com.insurance.pct.sw_insurance;
+package com.sw.insurance;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
