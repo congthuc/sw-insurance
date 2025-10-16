@@ -1,4 +1,4 @@
-package com.sw.insurance.api;
+package com.sw.insurance.blackbox;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
