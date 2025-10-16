@@ -20,7 +20,7 @@ public class InsuranceController {
         this.insuranceService = insuranceService;
     }
 
-    @GetMapping("/person/{personalId}")
+    @GetMapping("/customer/{personalId}")
     public ResponseEntity<List<InsuranceResponse>> getInsurancesByPersonalId(
             @PathVariable String personalId) {
         
