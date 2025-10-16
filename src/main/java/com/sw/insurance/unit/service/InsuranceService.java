@@ -1,4 +1,4 @@
-package com.sw.insurance.service;
+package com.sw.insurance.unit.service;
 
 import com.sw.insurance.dto.CarInsuranceDetails;
 import com.sw.insurance.dto.HealthInsuranceDetails;
@@ -11,7 +11,7 @@ import com.sw.insurance.model.PolicyDetails;
 import com.sw.insurance.repository.PersonRepository;
 import com.sw.insurance.repository.PolicyDetailsRepository;
 import com.sw.insurance.repository.PolicyRepository;
-import jakarta.persistence.EntityNotFoundException;
+import com.sw.insurance.exception.PersonNotFoundException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,7 +52,7 @@ public class InsuranceService {
     @Transactional(readOnly = true)
     public List<InsuranceResponse> getInsurancesByPersonalId(String personalId) {
         Person person = personRepository.findByPersonalId(personalId)
-                .orElseThrow(() -> new EntityNotFoundException("Person not found with personal ID: " + personalId));
+                .orElseThrow(() -> new PersonNotFoundException("Person not found with personal ID: " + personalId));
 
         return policyRepository.findActivePoliciesByPersonId(person.getId()).stream()
                 .map(this::mapToInsuranceResponse)
