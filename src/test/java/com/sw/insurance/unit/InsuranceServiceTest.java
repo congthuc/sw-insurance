@@ -1,4 +1,4 @@
-package com.sw.insurance.unit.service;
+package com.sw.insurance.unit;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sw.insurance.TestConfig;
@@ -11,7 +11,8 @@ import com.sw.insurance.model.PolicyDetails;
 import com.sw.insurance.repository.PersonRepository;
 import com.sw.insurance.repository.PolicyDetailsRepository;
 import com.sw.insurance.repository.PolicyRepository;
-import jakarta.persistence.EntityNotFoundException;
+import com.sw.insurance.service.FeatureFlagService;
+import com.sw.insurance.service.InsuranceService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -49,13 +50,19 @@ class InsuranceServiceTest {
     @Spy
     private ObjectMapper objectMapper = new ObjectMapper();
 
+    @Mock
+    private FeatureFlagService featureFlagService;
+
     @InjectMocks
     private InsuranceService insuranceService;
+
+    private static final String PET_INSURANCE_AVAILABLE = "pet-insurance-available";
 
     @BeforeEach
     void setUp() {
         // Reset mocks before each test
         reset(personRepository, policyRepository, policyDetailsRepository, restTemplate);
+
     }
 
     @Test
@@ -115,6 +122,8 @@ class InsuranceServiceTest {
         when(personRepository.findByPersonalId(person.getPersonalId())).thenReturn(Optional.of(person));
         when(policyRepository.findActivePoliciesByPersonId(person.getId())).thenReturn(List.of(petPolicy));
         when(policyDetailsRepository.findByPolicyId(petPolicy.getId())).thenReturn(Optional.of(petDetails));
+        // Default behavior for feature flag
+        when(featureFlagService.isFeatureEnabled(eq(PET_INSURANCE_AVAILABLE))).thenReturn(true);
 
         // When
         List<InsuranceResponse> result = insuranceService.getInsurancesByPersonalId(person.getPersonalId());

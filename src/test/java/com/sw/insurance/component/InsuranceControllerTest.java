@@ -4,7 +4,7 @@ import com.sw.insurance.TestDataFactory;
 import com.sw.insurance.controller.InsuranceController;
 import com.sw.insurance.dto.InsuranceResponse;
 import com.sw.insurance.exception.GlobalExceptionHandler;
-import com.sw.insurance.unit.service.InsuranceService;
+import com.sw.insurance.service.InsuranceService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

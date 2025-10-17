@@ -1,0 +1,31 @@
+{
+  "flags": {
+    "car-insurance-discount-campaign": {
+      "key": "car-insurance-discount-campaign",
+      "version": 1,
+      "on": true,
+      "offVariation": 0,
+      "variations": [false, true],
+      "targets": [
+        {
+          "values": ["user1@example.com", "user2@example.com"],
+          "variation": 1
+        }
+      ],
+      "fallthrough": {
+        "variation": 0
+      }
+    },
+    "pet-insurance-available": {
+      "key": "pet-insurance-available",
+      "version": 1,
+      "on": true,
+      "offVariation": 0,
+      "variations": [false, true],
+      "fallthrough": {
+        "variation": 1
+      }
+    }
+  },
+  "segments": {}
+}

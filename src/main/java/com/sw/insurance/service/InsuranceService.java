@@ -1,4 +1,4 @@
-package com.sw.insurance.unit.service;
+package com.sw.insurance.service;
 
 import com.sw.insurance.dto.CarInsuranceDetails;
 import com.sw.insurance.dto.HealthInsuranceDetails;
@@ -39,14 +39,23 @@ public class InsuranceService {
     @Value("${vehicle.service.path}")
     private String vehicleServicePath;
 
+
+    // Feature flag keys
+    private static final String PET_INSURANCE_AVAILABLE = "pet-insurance-available";
+    private static final String CAR_INSURANCE_DISCOUNT_CAMPAIGN = "car-insurance-discount-campaign";
+    
+    private final FeatureFlagService featureFlagService;
+
     public InsuranceService(PersonRepository personRepository, 
                           PolicyRepository policyRepository,
                           PolicyDetailsRepository policyDetailsRepository,
-                          RestTemplate restTemplate) {
+                          RestTemplate restTemplate,
+                          FeatureFlagService featureFlagService) {
         this.personRepository = personRepository;
         this.policyRepository = policyRepository;
         this.policyDetailsRepository = policyDetailsRepository;
         this.restTemplate = restTemplate;
+        this.featureFlagService = featureFlagService;
     }
 
     @Transactional(readOnly = true)
@@ -57,7 +66,24 @@ public class InsuranceService {
         return policyRepository.findActivePoliciesByPersonId(person.getId()).stream()
                 .map(this::mapToInsuranceResponse)
                 .filter(Objects::nonNull)
+                .filter(this::isPolicyVisible)  // Apply feature flag filtering
                 .collect(Collectors.toList());
+    }
+    
+    /**
+     * Determines if a policy should be visible based on feature flags
+     */
+    private boolean isPolicyVisible(InsuranceResponse response) {
+        if (response == null) return false;
+        
+        // Example: Hide pet insurance if the feature is disabled
+        if ("PET".equals(response.getProductCode())) {
+            return featureFlagService.isFeatureEnabled(PET_INSURANCE_AVAILABLE);
+        }
+        
+        // Add more feature flag checks for other policy types if needed
+        
+        return true; // Default to visible if no feature flag restrictions
     }
 
     private InsuranceResponse mapToInsuranceResponse(Policy policy) {
@@ -102,6 +128,12 @@ public class InsuranceService {
     
     private void handlePetInsurance(PolicyDetails details, InsuranceResponse response) {
         if (details.getPet() == null) return;
+        
+        // Check if pet insurance feature is enabled
+        if (!featureFlagService.isFeatureEnabled(PET_INSURANCE_AVAILABLE)) {
+            response.setDetails(null);
+            return;
+        }
         
         PetInsuranceDetails petDetails = new PetInsuranceDetails();
         petDetails.setPetName(details.getPet().getName());

@@ -2,7 +2,7 @@ package com.sw.insurance.controller;
 
 import com.sw.insurance.dto.InsuranceResponse;
 import com.sw.insurance.exception.PersonNotFoundException;
-import com.sw.insurance.unit.service.InsuranceService;
+import com.sw.insurance.service.InsuranceService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
