@@ -43,3 +43,31 @@ test {
         exclude '**/blackbox/**'
     }
 }
+
+// Docker Compose tasks
+task dockerComposeUp(type: Exec) {
+    group = 'docker'
+    description = 'Start all Docker containers defined in docker-compose.yml'
+    commandLine 'docker-compose', 'up', '--build', '-d'
+    doLast {
+        println 'Docker containers are starting up...'
+    }
+}
+
+task dockerComposeDown(type: Exec) {
+    group = 'docker'
+    description = 'Stop and remove all Docker containers defined in docker-compose.yml'
+    commandLine 'docker-compose', 'down'
+    doLast {
+        println 'Docker containers have been stopped and removed'
+    }
+}
+
+task dockerComposeLogs(type: Exec) {
+    group = 'docker'
+    description = 'Show logs for all Docker containers'
+    commandLine 'docker-compose', 'logs', '-f'
+}
+
+dockerComposeUp.dependsOn 'build'
+dockerComposeLogs.dependsOn 'dockerComposeUp'
