@@ -5,6 +5,7 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: docker
       SPRING_DATASOURCE_URL: jdbc:postgresql://ifsw-db:5432/ifsw-db
+      launchdarkly_sdk_key: ${launchdarkly_sdk_key}
     ports:
       - "8081:8081"
     restart: unless-stopped
