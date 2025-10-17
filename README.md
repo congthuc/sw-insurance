@@ -105,6 +105,29 @@ curl -X GET "http://localhost:8081/api/v1/insurances/customer/1234567890" \
 ]
 ```
 
+## Feature Toggles
+
+This service uses LaunchDarkly for feature toggling, allowing for controlled feature rollouts and A/B testing.
+
+### Available Feature Flags
+
+| Flag Key | Description | Default Value |
+|----------|-------------|---------------|
+| `pet-insurance-available` | Controls the availability of pet insurance features | `true` |
+| `car-insurance-discount-campaign` | Enables special discount campaign for car insurance | `false` |
+
+### Using Feature Flags in Code
+
+```java
+// Check if a feature is enabled
+if (featureFlagService.isFeatureEnabled("pet-insurance-available")) {
+    // Pet insurance specific logic
+}
+
+// With a default value
+boolean isEnabled = featureFlagService.isFeatureEnabled("pet-insurance-available", true);
+```
+
 ## Configuration
 
 ### Application Properties
@@ -115,10 +138,16 @@ curl -X GET "http://localhost:8081/api/v1/insurances/customer/1234567890" \
 | `spring.datasource.url` | Database URL | jdbc:postgresql://localhost:5432/ifsw-db |
 | `spring.datasource.username` | Database username | ifsw-user |
 | `spring.datasource.password` | Database password | Ifsweden@2025 |
+| `launchdarkly.sdk-key` | LaunchDarkly SDK key | - |
+| `launchdarkly.offline-mode` | Run LaunchDarkly in offline mode (uses local flags) | `true` (local), `false` (prod) |
+| `launchdarkly.flag-file` | Path to local flag definitions | `launchdarkly/ld-flags-local.json` |
 | `vehicle.service.url` | External vehicle service URL | http://localhost:8080 |
 | `vehicle.service.path` | Vehicle service API path | /api/v1/vehicles/ |
 | `vehicle.service.username` | Vehicle service username | admin |
 | `vehicle.service.password` | Vehicle service password | password |
+
+### Local Development
+For local development, you can use the local flag file located at `src/main/resources/launchdarkly/ld-flags-local.json`.
 
 ## Database
 
@@ -136,7 +165,15 @@ The application uses Flyway for database migrations. Migration scripts are locat
 
 ## Integration
 
-The service integrates with an external vehicle service for vehicle information.
+The service integrates with the following external services:
+
+### LaunchDarkly
+- Used for feature flag management
+- Local development uses offline mode with flags defined in JSON
+- Production connects to LaunchDarkly's cloud service
+
+### Vehicle Service
+- Provides vehicle information
 
 ### Vehicle Service Integration
 - Base URL: Configurable via `vehicle.service.url`
