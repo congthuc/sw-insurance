@@ -182,7 +182,7 @@ The service integrates with the following external services:
 
 ## License
 
-[Your License Here]
+PCT
 
 ---
 
