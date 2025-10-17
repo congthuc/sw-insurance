@@ -149,4 +149,4 @@ The service integrates with an external vehicle service for vehicle information.
 
 ---
 
-*This README was generated automatically. Please update it with your project-specific information.*
+*This assignment is supoprt by Cascade AI plugin for Intellij IDEA*
