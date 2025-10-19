@@ -31,15 +31,8 @@ public class InsuranceService {
     private final PersonRepository personRepository;
     private final PolicyRepository policyRepository;
     private final PolicyDetailsRepository policyDetailsRepository;
-    private final RestTemplate restTemplate;
+    private final VehicleInfoService vehicleInfoService;
     
-    @Value("${vehicle.service.url}")
-    private String vehicleServiceUrl;
-
-    @Value("${vehicle.service.path}")
-    private String vehicleServicePath;
-
-
     // Feature flag keys
     private static final String PET_INSURANCE_AVAILABLE = "pet-insurance-available";
     private static final String CAR_INSURANCE_DISCOUNT_CAMPAIGN = "car-insurance-discount-campaign";
@@ -49,12 +42,12 @@ public class InsuranceService {
     public InsuranceService(PersonRepository personRepository, 
                           PolicyRepository policyRepository,
                           PolicyDetailsRepository policyDetailsRepository,
-                          RestTemplate restTemplate,
+                          VehicleInfoService vehicleInfoService,
                           FeatureFlagService featureFlagService) {
         this.personRepository = personRepository;
         this.policyRepository = policyRepository;
         this.policyDetailsRepository = policyDetailsRepository;
-        this.restTemplate = restTemplate;
+        this.vehicleInfoService = vehicleInfoService;
         this.featureFlagService = featureFlagService;
     }
 
@@ -108,21 +101,9 @@ public class InsuranceService {
     private void handleCarInsurance(PolicyDetails details, InsuranceResponse response) {
         if (details.getVehicleRegistration() == null) return;
         
-        try {
-            String url = String.format("%s%s%s", vehicleServiceUrl, vehicleServicePath, details.getVehicleRegistration());
-            VehicleInfo vehicleInfo = restTemplate.getForObject(url, VehicleInfo.class);
-            
-            if (vehicleInfo != null) {
-                CarInsuranceDetails carDetails = new CarInsuranceDetails();
-                carDetails.setRegistrationNumber(vehicleInfo.getRegistrationNumber());
-                carDetails.setMake(vehicleInfo.getMake());
-                carDetails.setModel(vehicleInfo.getModel());
-                carDetails.setYear(vehicleInfo.getYear());
-                carDetails.setColor(vehicleInfo.getColor());
-                response.setDetails(carDetails);
-            }
-        } catch (Exception e) {
-            System.err.println("Error fetching vehicle info: " + e.getMessage());
+        CarInsuranceDetails carDetails = vehicleInfoService.getVehicleInfo(details.getVehicleRegistration());
+        if (carDetails != null) {
+            response.setDetails(carDetails);
         }
     }
     

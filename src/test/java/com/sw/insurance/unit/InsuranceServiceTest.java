@@ -13,6 +13,7 @@ import com.sw.insurance.repository.PolicyDetailsRepository;
 import com.sw.insurance.repository.PolicyRepository;
 import com.sw.insurance.service.FeatureFlagService;
 import com.sw.insurance.service.InsuranceService;
+import com.sw.insurance.service.VehicleInfoService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,8 +22,6 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.web.client.RestTemplate;
-
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
@@ -45,7 +44,7 @@ class InsuranceServiceTest {
     private PolicyDetailsRepository policyDetailsRepository;
 
     @Mock
-    private RestTemplate restTemplate;
+    private VehicleInfoService vehicleInfoService;
 
     @Spy
     private ObjectMapper objectMapper = new ObjectMapper();
@@ -61,8 +60,7 @@ class InsuranceServiceTest {
     @BeforeEach
     void setUp() {
         // Reset mocks before each test
-        reset(personRepository, policyRepository, policyDetailsRepository, restTemplate);
-
+        reset(personRepository, policyRepository, policyDetailsRepository, vehicleInfoService, featureFlagService);
     }
 
     @Test
@@ -78,7 +76,7 @@ class InsuranceServiceTest {
         
         assertEquals("Person not found with personal ID: " + personalId, exception.getMessage());
         verify(personRepository).findByPersonalId(personalId);
-        verifyNoMoreInteractions(policyRepository, policyDetailsRepository, restTemplate);
+        verifyNoMoreInteractions(policyRepository, policyDetailsRepository);
     }
 
     @Test
@@ -92,8 +90,8 @@ class InsuranceServiceTest {
         when(personRepository.findByPersonalId(person.getPersonalId())).thenReturn(Optional.of(person));
         when(policyRepository.findActivePoliciesByPersonId(person.getId())).thenReturn(List.of(carPolicy));
         when(policyDetailsRepository.findByPolicyId(carPolicy.getId())).thenReturn(Optional.of(carDetails));
-        when(restTemplate.getForObject(anyString(), eq(com.sw.insurance.dto.VehicleInfo.class)))
-            .thenReturn(vehicleInfo);
+        when(vehicleInfoService.getVehicleInfo(carDetails.getVehicleRegistration()))
+            .thenReturn(TestDataFactory.createCarInsuranceDetails(vehicleInfo));
 
         // When
         List<InsuranceResponse> result = insuranceService.getInsurancesByPersonalId(person.getPersonalId());
@@ -109,7 +107,7 @@ class InsuranceServiceTest {
         verify(personRepository).findByPersonalId(person.getPersonalId());
         verify(policyRepository).findActivePoliciesByPersonId(person.getId());
         verify(policyDetailsRepository).findByPolicyId(carPolicy.getId());
-        verify(restTemplate).getForObject(anyString(), eq(com.sw.insurance.dto.VehicleInfo.class));
+        verify(vehicleInfoService).getVehicleInfo(carDetails.getVehicleRegistration());
     }
 
     @Test
@@ -139,7 +137,6 @@ class InsuranceServiceTest {
         verify(personRepository).findByPersonalId(person.getPersonalId());
         verify(policyRepository).findActivePoliciesByPersonId(person.getId());
         verify(policyDetailsRepository).findByPolicyId(petPolicy.getId());
-        verifyNoInteractions(restTemplate);
     }
 
     @Test
@@ -167,6 +164,5 @@ class InsuranceServiceTest {
         verify(personRepository).findByPersonalId(person.getPersonalId());
         verify(policyRepository).findActivePoliciesByPersonId(person.getId());
         verify(policyDetailsRepository).findByPolicyId(healthPolicy.getId());
-        verifyNoInteractions(restTemplate);
     }
 }

@@ -108,6 +108,19 @@ public class TestDataFactory {
         vehicleInfo.setColor("Silver");
         return vehicleInfo;
     }
+    
+    public static CarInsuranceDetails createCarInsuranceDetails(com.sw.insurance.dto.VehicleInfo vehicleInfo) {
+        if (vehicleInfo == null) {
+            vehicleInfo = createVehicleInfo();
+        }
+        CarInsuranceDetails details = new CarInsuranceDetails();
+        details.setRegistrationNumber(vehicleInfo.getRegistrationNumber());
+        details.setMake(vehicleInfo.getMake());
+        details.setModel(vehicleInfo.getModel());
+        details.setYear(vehicleInfo.getYear());
+        details.setColor(vehicleInfo.getColor());
+        return details;
+    }
 
     public static InsuranceResponse createCarInsuranceResponse() {
         com.sw.insurance.dto.VehicleInfo vehicleInfo = createVehicleInfo();
